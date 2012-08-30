@@ -76,7 +76,12 @@ do
 done
 
 # foodcritic check
-foodcritic "${FOODCRITIC_FLAGS}" $PWD > /dev/null 2>&1
+if [[ -n $CHEF_VERSION ]]; then
+  foodcritic "${FOODCRITIC_FLAGS}" -c $CHEF_VERSION $PWD > /dev/null 2>&1
+else
+  foodcritic "${FOODCRITIC_FLAGS}" $PWD > /dev/null 2>&1
+fi
+
 if [[ $? -ne 0 ]] ; then
     echo "Foodcritic lint tests failed. Run 'foodcritic --epic-fail any .'" >&2
     STATUS=2
