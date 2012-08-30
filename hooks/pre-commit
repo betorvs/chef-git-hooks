@@ -2,26 +2,22 @@
 
 # Assumptions:
 #
-#    Puppet >= 2.7 is installed on this machine
-#    puppet-lint is installed on this machine
+#    foodcritic is installed on this machine
 #    ERB is installed on this machine
 #    Adjust LINTFLAGS as appropriate
 
 # Redirect output to stderr.
 exec 1>&2
 
-PUPPETLINT_FLAGS=${PUPPETLINT_FLAGS:-"--no-autoloader_layout-check --no-80chars-check"}
+FOODCRITIC_FLAGS=${FOODCRITIC_FLAGS:-"--epic-fail any"}
 TMPFILE=$(mktemp)
 STATUS=0
 
 # Register exit trap for removing temporary files
 trap 'rm -rf $TMPFILE' EXIT INT HUP
 
-# Check for Puppet binary
-which puppet >/dev/null 2>&1 || exit 1
-
-# Check for puppet-lint
-which puppet-lint >/dev/null 2>&1 || exit 1
+# Check for foodcritic
+which foodcritic >/dev/null 2>&1 || exit 1
 
 # Check for erb
 which erb >/dev/null 2>&1 || exit 1
@@ -57,21 +53,15 @@ do
         STATUS=2
     else
         case $extension in
-            pp)
-                # Puppet syntax check
-                puppet parser validate $TMPFILE >/dev/null 2>&1
+            rb)
+                # Ruby syntax check
+                ruby -w -T1 -c $TMPFILE > /dev/null 2>&1
                 if [[ $? -ne 0 ]]; then
-                    echo "Puppet syntax error in ${file}. Run 'puppet parser validate ${file}'" >&2
-                    STATUS=2
-                fi
-
-                # puppet-lint check
-                puppet-lint $PUPPETLINT_FLAGS --log-format "${file}:%{linenumber} %{KIND} - %{message}" $TMPFILE 2> /dev/null
-                if [[ $? -ne 0 ]] ; then
+                    echo "Ruby syntax error in ${file}. Run 'ruby -w -T1 -c ${file}'" >&2
                     STATUS=2
                 fi
             ;;
-    
+
             erb)
                 # syntax check templates - this doesn't catch a lot of mistakes,
                 # but it should catch gross mistakes
@@ -84,5 +74,12 @@ do
         esac
     fi
 done
+
+# foodcritic check
+foodcritic "${FOODCRITIC_FLAGS}" $PWD > /dev/null 2>&1
+if [[ $? -ne 0 ]] ; then
+    echo "Foodcritic lint tests failed. Run 'foodcritic --epic-fail any .'" >&2
+    STATUS=2
+fi
 
 exit $STATUS
