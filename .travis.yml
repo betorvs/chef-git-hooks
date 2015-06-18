@@ -4,5 +4,8 @@ before_script:
 language: ruby
 rvm:
   - 1.9.3
+  - 2.1.3
+  - 2.2.2
+  - head
 env:
   - CHEF_VERSION=10.12.0
