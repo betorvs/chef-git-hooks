@@ -10,7 +10,7 @@
 exec 1>&2
 
 FOODCRITIC_FLAGS=${FOODCRITIC_FLAGS:-"--epic-fail any"}
-TMPFILE=$(mktemp)
+TMPFILE=$(mktemp "${TMPDIR:-/tmp}/tmp.XXXXXXXXXX")
 STATUS=0
 
 # Register exit trap for removing temporary files
