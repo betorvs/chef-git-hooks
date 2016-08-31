@@ -36,7 +36,7 @@ IFS="
 
 # Get a list of files changed in this transaction
 declare -a FILES
-FILES=$(git diff --cached --name-only --diff-filter=ACM "${revision}")
+FILES=$(find . -type f ! -name ".git*" ! -name ".kitchen*" |egrep -v "git|kitchen|chefignore|Berksfile.lock")
 
 for file in ${FILES[@]}
 do
@@ -73,6 +73,7 @@ do
             ;;
         esac
     fi
+
 done
 
 # foodcritic check
@@ -88,7 +89,7 @@ if [[ $? -ne 0 ]] ; then
 fi
 
 if [ $STATUS == "0" ]; then
-  cookbook=$( find . -type f |grep "metadata.rb" |cut -f2 -d"'" )
+  cookbook=$( echo "$FILES"|grep "metadata.rb" |cut -f2 -d"'" )
   cookbook_name=$( grep name $cookbook |cut -f2 -d"\""|cut -f2 -d"'" )
   echo "knife cookbook upload $cookbook_name"
 fi
