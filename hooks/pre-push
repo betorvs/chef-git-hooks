@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# This script of pre-push is for not forget to upload an cookbook into chef server
+#
+# version: 0.0.1
+# author: Roberto Scudeller
+# 
+#
+
+FILES=$(find . -type f ! -name ".git*" ! -name ".kitchen*" |egrep -v "git|kitchen|chefignore|Berksfile.lock")
+
+  cookbook=$( echo "$FILES"|grep "metadata.rb" |cut -f2 -d"'" )
+  cookbook_name=$( grep name $cookbook |cut -f2 -d"\""|cut -f2 -d"'" )
+  if [[ "${PWD}" == *cookbooks* ]]; then
+    echo "Do you want update the cookbook into chef server? Ex.: knife cookbook upload $cookbook_name  (Y/n)"
+    read answer
+    case $answer in
+      [Nn]*)
+        echo "skipping..."
+        exit 0 ;;
+      *) 
+      echo "running: knife cookbook upload $cookbook_name"
+      knife cookbook upload $cookbook_name
+      ;;
+    esac     
+  fi
+
+exit 0

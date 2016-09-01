@@ -91,7 +91,9 @@ fi
 if [ $STATUS == "0" ]; then
   cookbook=$( echo "$FILES"|grep "metadata.rb" |cut -f2 -d"'" )
   cookbook_name=$( grep name $cookbook |cut -f2 -d"\""|cut -f2 -d"'" )
-  echo "knife cookbook upload $cookbook_name"
+  if [[ "${PWD}" == *cookbooks* ]]; then
+    echo "When you push this, pre-push hook will do this: knife cookbook upload $cookbook_name"
+  fi
 fi
 
 exit $STATUS
