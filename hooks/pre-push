@@ -12,16 +12,15 @@ FILES=$(find . -type f ! -name ".git*" ! -name ".kitchen*" |egrep -v "git|kitche
   cookbook=$( echo "$FILES"|grep "metadata.rb" |cut -f2 -d"'" )
   cookbook_name=$( grep name $cookbook |cut -f2 -d"\""|cut -f2 -d"'" )
   if [[ "${PWD}" == *cookbooks* ]]; then
-    echo "Do you want update the cookbook into chef server? Ex.: knife cookbook upload $cookbook_name  (Y/n)"
-    read answer
-    case $answer in
-      [Nn]*)
-        echo "skipping..."
-        exit 0 ;;
-      *) 
-      echo "running: knife cookbook upload $cookbook_name"
-      knife cookbook upload $cookbook_name
+    read -p "Do you want update the cookbook into chef server? Ex.: knife cookbook upload $cookbook_name  (y/N)" -n 2 -r < /dev/tty
+    case $REPLY in
+      [YySs]*) 
+        echo "running: knife cookbook upload $cookbook_name"
+        knife cookbook upload $cookbook_name
       ;;
+      *)
+        echo "skipping...run: knife cookbook upload $cookbook_name "
+        exit 0 ;;
     esac     
   fi
 
