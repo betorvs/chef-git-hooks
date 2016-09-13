@@ -18,6 +18,12 @@ cookbook_target="blau" ; cd ${HOME}/git/chef-repo/.git/modules/cookbooks/${cookb
 ```
 
 
+Check where you config pre-commit:
+```
+find ${HOME}/git/chef-repo/.git/modules/cookbooks -name "pre-commit" -exec ls -l {} \;
+```
+
+
 Hooks
 -----
 **pre-commit:**
